@@ -14,6 +14,10 @@ The script performs the following steps:
 
 This script is intended to be used as a command-line tool, with the JSON file path and optional flags (-d for delete original, -w for overwrite) passed as command-line arguments.
 """
+import sys
+import site
+sys.path.extend(site.getsitepackages())
+
 import json
 import os
 import subprocess
@@ -52,19 +56,32 @@ def read_json_file(file_path):
         print(f"🔴 Error: JSON file '{file_path}' is empty or invalid.")
         return []
 
-def compress_videos(video_files, delete_original, overwrite=False):
+def compress_videos(video_files, delete_original, overwrite=False, dist_folder=None):
     for file in video_files:
         file = os.path.expanduser(file)
         if not os.path.isfile(file):
             print(f"🔴 Error: Video file '{file}' not found.")
             continue
-        file_name, file_extension = os.path.splitext(file)
-        # output_file = f"{file_name}_compressed{file_extension}"
-        output_file = f"{file_name}.mp4"
+        file_name, file_extension = os.path.splitext(os.path.basename(file))
+        if dist_folder:
+            os.makedirs(dist_folder, exist_ok=True)
+            output_file = os.path.join(dist_folder, f"{file_name}.mp4")
+        else:
+            output_file = f"{os.path.splitext(file)[0]}.mp4"
         print(f"Compressing '{file}'...")
         try:
             input_file = ffmpeg.input(file)
-            output_file = ffmpeg.output(input_file, output_file, vcodec='libx264', crf=23, pix_fmt='yuv420p', movflags='+faststart')
+            # The following settings are the default settings used by the ffmpeg-python library
+            
+            # output_file = ffmpeg.output(input_file, output_file, vcodec='libx264', crf=23, pix_fmt='yuv420p', movflags='+faststart')
+            
+            # the following settings are a bit more aggressive than the default settings
+            output_file = ffmpeg.output(input_file, output_file,
+                            vcodec='libx264',
+                            crf=30,
+                            preset='slow',
+                            pix_fmt='yuv420p',
+                            movflags='+faststart') # vf='scale=1280:-2')  # Adjust resolution as needed
             ffmpeg.run(output_file, overwrite_output=overwrite)
             print(f"Compression successful: '{output_file}'")
             if delete_original:
@@ -72,6 +89,7 @@ def compress_videos(video_files, delete_original, overwrite=False):
                 print(f"Deleted original file: '{file}'")
         except ffmpeg.Error:
             print(f"🔴 Error: Compression failed for '{file}'")
+
             
 if __name__ == '__main__':
     if len(sys.argv) not in [2, 3, 4]:
