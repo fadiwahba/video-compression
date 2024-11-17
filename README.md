@@ -19,12 +19,34 @@ This project provides a Python script for compressing video files using FFmpeg. 
 
 ## Usage
 
-The script is run from the command line with the following syntax:
+**[Optional] Create conda env**
+```shell
+conda create --name videos_project python=3.11
+```
+
+**Activate the environment**
+```shell
+conda activate videos_project
+```
+
+**Install the requirements**
+```shell
+conda install --file requirements.txt
+
+```
+OR
+```shell
+pip install -r requirements.txt
+```
+
+
+**The script is run from the command line with the following syntax:**
 
 ```shell
-python compress_videos.py <path/to/your/json/file.json> [-d] [-w]
+python main.py <path/to/your/videos/folder> [-d] [-w] [--dist]
 ```
 - `-d`: Optional flag to delete original files after compression
 - `-w`: Optional flag to overwrite existing compressed files
+- `--dist`: Optional flag for destination folder
 
 The JSON file should contain an array of video file paths to be compressed.

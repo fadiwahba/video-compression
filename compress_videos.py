@@ -68,7 +68,7 @@ def compress_videos(video_files, delete_original, overwrite=False, dist_folder=N
             output_file = os.path.join(dist_folder, f"{file_name}.mp4")
         else:
             output_file = f"{os.path.splitext(file)[0]}.mp4"
-        print(f"Compressing '{file}'...")
+        print(f"⚛️ Compressing '{file}'...")
         try:
             input_file = ffmpeg.input(file)
             # The following settings are the default settings used by the ffmpeg-python library
@@ -83,7 +83,7 @@ def compress_videos(video_files, delete_original, overwrite=False, dist_folder=N
                             pix_fmt='yuv420p',
                             movflags='+faststart') # vf='scale=1280:-2')  # Adjust resolution as needed
             ffmpeg.run(output_file, overwrite_output=overwrite)
-            print(f"Compression successful: '{output_file}'")
+            print(f"✅ Compression successful: '{output_file}'")
             if delete_original:
                 os.remove(file)
                 print(f"Deleted original file: '{file}'")
